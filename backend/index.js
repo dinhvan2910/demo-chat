@@ -43,7 +43,9 @@ socketIO.on('connection', (socket) => {
   });
 
 
-
+  socket.on('createJoinChat', () => {
+    socket.join('createJoinChat');
+  });
 
   socket.on('getAllGroups', () => {
     socket.emit('groupList', chatGroups);
@@ -55,7 +57,10 @@ socketIO.on('connection', (socket) => {
       currentGroupName,
       messages: []
     });
-    console.log('vua tao group', chatGroups)
+    console.log('vua tao group', chatGroups);
+    socketIO
+      .to('createJoinChat')
+      .emit("newGroup", chatGroups);
     socket.emit('groupList', chatGroups);
   });
 
@@ -74,7 +79,7 @@ socketIO.on('connection', (socket) => {
     const filteredGroup = chatGroups.filter(
       (item) => item.id === groupId
     );
-    console.log('filteredGroup',filteredGroup);
+    console.log('filteredGroup', filteredGroup);
     const newMessage = {
       id: createUniqueId(),
       text: currentChatMesage,

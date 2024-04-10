@@ -50,6 +50,12 @@ function HomeScreen({ navigation }) {
         setCurrentUser(null);
       }
     });
+    
+    socket.on("user connected", (user) => {
+      // initReactiveProperties(user);
+      console.log("user connected", user);
+    });
+
     socket.on("users", (users) => {
       users.forEach((user) => {
         user.self = user.userID === socket.id;

@@ -21,15 +21,10 @@ function ChatScreen({ navigation }) {
 
 
   useEffect(() => {
-    socket.on("user connected", (user) => {
-      // initReactiveProperties(user);
-      console.log("user connected", user);
-    });
-    socket.emit('getAllGroups');
-    socket.on('groupList', (groups) => {
-      setAllChatRooms(groups);
-      console.log('groups', groups)
-      console.log('allChatRooms', allChatRooms)
+    socket.emit('createJoinChat');
+    socket.on("newGroup", (data) => {
+      console.log(`${socket.id} has new newGroup: `, data);
+      setAllChatRooms(data);
     });
   }, [socket]);
 
