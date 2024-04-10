@@ -1,39 +1,6 @@
 
-# Created by https://www.gitignore.io/api/node,windows,angular,visualstudiocode
-# Edit at https://www.gitignore.io/?templates=node,windows,angular,visualstudiocode
-
-### Angular ###
-## Angular ##
-# compiled output
-dist/
-tmp/
-app/**/*.js
-app/**/*.js.map
-.expo
-
-# dependencies
-node_modules/
-bower_components/
-
-# IDEs and editors
-.idea/
-
-# misc
-/.angular/cache
-.sass-cache/
-connect.lock/
-coverage/
-libpeerconnection.log/
-npm-debug.log
-testem.log
-typings/
-
-# e2e
-e2e/*.js
-e2e/*.map
-
-#System Files
-.DS_Store/
+# Created by https://www.gitignore.io/api/node,windows,visualstudiocode
+# Edit at https://www.gitignore.io/?templates=node,windows,visualstudiocode
 
 ### Node ###
 # Logs
@@ -74,11 +41,14 @@ bower_components
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
+dist/
 
 # Dependency directories
+node_modules/
 jspm_packages/
 
 # TypeScript v1 declaration files
+typings/
 
 # TypeScript cache
 *.tsbuildinfo
@@ -127,6 +97,7 @@ public/
 .dynamodb/
 
 ### VisualStudioCode ###
+.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -163,4 +134,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.gitignore.io/api/node,windows,angular,visualstudiocode
+# End of https://www.gitignore.io/api/node,windows,visualstudiocode
