@@ -20,11 +20,11 @@ function HomeScreen({ navigation }) {
     setCurrentUserName,
     currentUser,
     setCurrentUser,
+    allUsers,
     setAllUsers,
   } = useContext(GlobalContext);
 
   const initReactiveProperties = (user) => {
-    user.connected = true;
     user.messages = [];
     user.hasNewMessages = false;
   };
@@ -39,55 +39,49 @@ function HomeScreen({ navigation }) {
 
     Keyboard.dismiss();
   }
-  
-  // useLayoutEffect(() => {
-  //   function fetchUsers() {
-  //     fetch("http://192.168.88.182:4000/getUsers")
-  //       .then((res) => res.json())
-  //       .then((users) => {
-  //         console.log("users list api:", users);
-  //       })
-  //       .catch((err) => console.error(err));
-  //   }
-  //   fetchUsers();
-  //   socket.on("userConnected", () => {
-  //     console.log("Connected to the Socket.IO server");
-  //     console.log(socket.id);
-  //   });
-  // }, []);
+
+  function setUsersData(users) {
+    users.forEach((user) => {
+      user.self = user.userID === socket.id;
+      initReactiveProperties(user);
+      setCurrentUser(user);
+    });
+    // put the current user first, and then sort by userName
+    users = users.sort((a, b) => {
+      if (a.self) return -1;
+      if (b.self) return 1;
+      if (a.userName < b.userName) return -1;
+      return a.userName > b.userName ? 1 : 0;
+    });
+    setAllUsers(users);
+  }
 
   useEffect(() => {
     socket.on("connect", () => {
-      console.log("Connected to the Socket.IO server");
+      console.log(`${socket.id} Connected to the Socket.IO server`);
       console.log(socket.id);
     });
+
     socket.on("connect_error", (err) => {
       if (err.message === "invalid username") {
         setCurrentUser(null);
       }
     });
-
     socket.on("users", (users) => {
       console.log("users list home:", users);
-      users.forEach((user) => {
-        user.self = user.userID === socket.id;
-        initReactiveProperties(user);
-        setCurrentUser(user);
-      });
-      // put the current user first, and then sort by userName
-      users = users.sort((a, b) => {
-        if (a.self) return -1;
-        if (b.self) return 1;
-        if (a.userName < b.userName) return -1;
-        return a.userName > b.userName ? 1 : 0;
-      });
-      setAllUsers(users);
+      setUsersData(users);
     });
 
+    socket.on('userDisconnected', ({userID, users}) => {
+      console.log('All user userDisconnected', users);
+      console.log('User disconnected:', userID);
+      setUsersData(users);
+    });
   }, [socket]);
 
   useEffect(() => {
     console.log('currentUser home screen', currentUser);
+    console.log('All user home screen', allUsers);
     if (currentUser && Object.keys(currentUser).length) {
       navigation.navigate("Tabs");
     }

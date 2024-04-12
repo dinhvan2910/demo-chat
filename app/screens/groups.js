@@ -31,7 +31,6 @@ function GroupsScreen({ navigation }) {
   }, [socket]);
 
   useEffect(() => {
-    // console.log('currentUser chat screen', currentUser);
     if (!currentUser || !Object.keys(currentUser).length) {
       navigation.navigate("HomeScreen");
     }
@@ -41,7 +40,7 @@ function GroupsScreen({ navigation }) {
     <View style={styles.mainWrapper}>
       <View style={styles.topContainer}>
         <View style={styles.header}>
-          <Text style={styles.headingUserName}>{currentUserName}</Text>
+          <Text style={styles.headingUserName}>Danh sách Group chat</Text>
           <Pressable onPress={() => setModalVisible(true)}>
             <AntDesign name="addusergroup" size={30} color="blue" />
           </Pressable>
@@ -58,13 +57,6 @@ function GroupsScreen({ navigation }) {
           ) : null
         }
       </View>
-      {/* <View style={styles.bottomContainer}>
-        <Pressable onPress={() => setModalVisible(true)} style={styles.button}>
-          <View>
-            <Text style={styles.buttonText}>Tạo nhóm mới</Text>
-          </View>
-        </Pressable>
-      </View> */}
       {
         modalVisible && <NewGroupModal />
       }

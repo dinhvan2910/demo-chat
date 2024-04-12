@@ -45,14 +45,6 @@ function MessageScreen({ navigation, route }) {
           content: dataChat,
           to: itemData.userID,
         });
-        // const newMessage = {
-        //   id: Math.random().toString(20).substring(2, 10),
-        //   text: currentChatMesage,
-        //   currentUserName: currentUserName,
-        //   time: `${timeData.hour}:${timeData.minutes}`,
-        // };
-        // currentUser.messages.push(newMessage);
-        // setCurrentUser(currentUser);
       }
 
       setCurrentChatMessage('');
@@ -80,19 +72,6 @@ function MessageScreen({ navigation, route }) {
       socket.on("newPrivateMessage", ({ newMessage, from }) => {
         console.log('newPrivateMessage newMessage ' + socket.id, newMessage);
         setAllChatMessages(newMessage);
-        // const user = {
-        //   ...currentUser,
-        // };
-        // if (user.messages && user.messages.length) {
-        //   const findUser = user.messages.find(x => x.id === newMessage.id);
-        //   if (!findUser) {
-        //     user.messages.push(newMessage);
-        //   }
-        // } else {
-        //   user.messages.push(newMessage);
-        // }
-        // console.log('user message', user);
-        // setCurrentUser(user);
       });
       socket.on("foundUserMessage", (message) => {
         console.log(`new Message foundUserMessage ${socket.id}`, message);
@@ -105,7 +84,6 @@ function MessageScreen({ navigation, route }) {
     <View style={styles.mainWrapper}>
       <View style={[styles.mainWrapper, { paddingVertical: 15, paddingHorizontal: 10 }]}>
         {
-          // data === 'groups' ? (
           allChatMessages && allChatMessages[0] ?
             <FlatList
               data={allChatMessages}
@@ -113,15 +91,6 @@ function MessageScreen({ navigation, route }) {
               keyExtractor={(item) => item.id}
             />
             : ''
-          // ) : (
-          //   currentUser && currentUser.messages ?
-          //   <FlatList
-          //     data={currentUser.messages}
-          //     renderItem={({ item }) => <MessageComponent item={item} currentUserName={currentUserName} />}
-          //     keyExtractor={(item) => item.id}
-          //   />
-          //   : ''
-          // )
         }
       </View>
       <View style={styles.messageInputContainer}>

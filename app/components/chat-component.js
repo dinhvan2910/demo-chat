@@ -23,7 +23,16 @@ function ChatComponent({ item, data }) {
         <View>
           <Text style={styles.groupName}>{data === 'groups' ? item.currentGroupName : item.userName}</Text>
           <Text style={styles.messages}>
-            {data === 'users' && item.self === true ? 'yourself' : ''}
+            {
+              data === 'users' ?
+                (item.self === true ?
+                  'yourself' : (item.connected ?
+                    <Text style={styles.statusOnline}>Online</Text> :
+                    <Text style={styles.statusOffline}>Offline</Text>
+                  )
+                ) :
+                ''
+            }
           </Text>
         </View>
         <View>
@@ -48,6 +57,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     height: 80,
     marginBottom: 10,
+  },
+  statusOnline: {
+    color: 'green',
+  },
+  statusOffline: {
+    color: 'red',
   },
   groupName: {
     fontSize: 18,

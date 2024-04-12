@@ -14,7 +14,17 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const AppTabs = () => (
-  <Tab.Navigator initialRouteName="GroupsScreen">
+  <Tab.Navigator initialRouteName="UsersScreen">
+    <Tab.Screen
+      name="UsersScreen"
+      component={UsersScreen}
+      options={{
+        headerShown: false,
+        tabBarLabel: 'User',tabBarIcon: () => (
+          <AntDesign name="message1" size={24} color="black" />
+        ),
+      }}
+    />
     <Tab.Screen
       name="GroupsScreen"
       component={GroupsScreen}
@@ -23,16 +33,6 @@ const AppTabs = () => (
         tabBarLabel: 'Room',
         tabBarIcon: () => (
           <FontAwesome6 name="people-group" size={24} color="black" />
-        ),
-      }}
-    />
-    <Tab.Screen
-      name="UsersScreen"
-      component={UsersScreen}
-      options={{
-        headerShown: false,
-        tabBarLabel: 'User',tabBarIcon: () => (
-          <AntDesign name="message1" size={24} color="black" />
         ),
       }}
     />

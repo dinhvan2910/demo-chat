@@ -36,10 +36,11 @@ socketIO.on('connection', (socket) => {
         userID: id,
         userName: socket.userName,
         messages: [],
+        connected: true,
       });
     }
   }
-  socket.emit("users", users);
+  socketIO.emit("users", users);
   console.log('all users', users)
 
   // notify existing users
@@ -122,8 +123,14 @@ socketIO.on('connection', (socket) => {
   });
 
   socket.on("disconnect", () => {
-    socket.disconnect();
+    // socket.disconnect();
     console.log(`${socket.id} user is just disconnected`);
+    const index = users.findIndex(x => x.userID === socket.id);
+    if (index >= 0) {
+      users[index].connected = false;
+    }
+    console.log('users after disconnected', users)
+    socketIO.emit('userDisconnected', { userID: socket.id, users });
   });
 });
 
