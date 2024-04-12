@@ -13,7 +13,8 @@ function createUniqueId() {
   return Math.random().toString(20).substring(2, 10);
 }
 
-let chatGroups = []
+let chatGroups = [];
+let users = [];
 
 socketIO.use((socket, next) => {
   const userName = socket.handshake.auth.currentUserName;
@@ -28,27 +29,28 @@ socketIO.use((socket, next) => {
 socketIO.on('connection', (socket) => {
   console.log(`${socket.id} user is just connected`);
 
-  const users = [];
   for (let [id, socket] of socketIO.of("/").sockets) {
-    users.push({
-      userID: id,
-      userName: socket.userName,
-    });
+    const user = users.find(x => x.userID === id && x.userName === socket.userName);
+    if (!user) {
+      users.push({
+        userID: id,
+        userName: socket.userName,
+      });
+    }
   }
   socket.emit("users", users);
+  console.log('all users', users)
+
   // notify existing users
-  socket.broadcast.emit("user connected", {
+  socket.broadcast.emit("userConnected", {
     userID: socket.id,
     userName: socket.userName,
   });
 
-
   socket.on('createJoinChat', () => {
     socket.join('createJoinChat');
-  });
-
-  socket.on('getAllGroups', () => {
     socket.emit('groupList', chatGroups);
+    socket.emit("users", users);
   });
 
   socket.on('createNewGroup', (currentGroupName) => {
@@ -67,11 +69,26 @@ socketIO.on('connection', (socket) => {
   socket.on("findGroup", (id) => {
     const filteredGroup = chatGroups.filter((item) => item.id === id);
     console.log(`filteredGroup ${socket.id}:`, filteredGroup);
-    
+
     socket.join(filteredGroup[0].currentGroupName);
     console.log(`User ${socket.id} a join room :` + filteredGroup[0].currentGroupName);
 
     socket.emit("foundGroup", filteredGroup[0].messages);
+  });
+
+  socket.on("privateMessage", ({ content, to }) => {
+    console.log('privateMessage content', content);
+    console.log('privateMessage to', to);
+    const newMessage = {
+      id: createUniqueId(),
+      text: content.currentChatMesage,
+      currentUserName: content.currentUserName,
+      time: `${content.timeData.hour}:${content.timeData.minutes}`,
+    };
+    socket.to(to).emit("privateMessage", {
+      newMessage,
+      from: socket.id,
+    });
   });
 
   socket.on("newChatMessage", (data) => {
@@ -101,9 +118,12 @@ socketIO.on('connection', (socket) => {
   });
 });
 
-app.get('/', (req, res) => {
-  console.log(chatGroups)
+app.get('/getGroups', (req, res) => {
   res.json(chatGroups);
+});
+
+app.get('/getUsers', (req, res) => {
+  res.json(users);
 });
 
 server.listen(PORT, () => {

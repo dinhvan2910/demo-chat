@@ -1,27 +1,29 @@
-import { FontAwesome } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-function ChatComponent({ item }) {
+function ChatComponent({ item, data }) {
   const navigation = useNavigation();
 
   function handleNavigateToMessage() {
-    navigation.navigate('MessageScreen', {
-      currentGroupName: item.currentGroupName,
-      currentGroupId: item.id,
-    });
+    if (!(data === 'users' && item.self === true)) {
+      navigation.navigate('MessageScreen', {
+        data,
+        itemData: item
+      });
+    }
   }
 
   return (
     <Pressable onPress={handleNavigateToMessage} style={styles.chat}>
       <View style={styles.circle}>
-        <FontAwesome name='group' size={24} color={"black"} />
+        <AntDesign name="message1" size={24} color="black" />
       </View>
       <View style={styles.rightContainer}>
         <View>
-          <Text style={styles.groupName}>{item.currentGroupName}</Text>
+          <Text style={styles.groupName}>{data === 'groups' ? item.currentGroupName : item.userName}</Text>
           <Text style={styles.messages}>
-            {item && item.messages && item.messages.length ? item.messages[item.messages.length - 1].text : 'Bắt đầu nhắn nào !!!'}
+            {data === 'users' && item.self === true ? 'yourself' : ''}
           </Text>
         </View>
         <View>

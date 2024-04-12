@@ -6,7 +6,7 @@ import ChatComponent from '../components/chat-component';
 import NewGroupModal from '../components/modal-component';
 import { socket } from '../utils';
 
-function ChatScreen({ navigation }) {
+function GroupsScreen({ navigation }) {
   const {
     currentUserName,
     currentUser,
@@ -16,12 +16,14 @@ function ChatScreen({ navigation }) {
     setModalVisible,
     setCurrentUser,
     setShowLoginView,
-    allUsers,
+    setAllUsers,
   } = useContext(GlobalContext);
-
 
   useEffect(() => {
     socket.emit('createJoinChat');
+    socket.on("groupList", (groups) => {
+      setAllChatRooms(groups);
+    });
     socket.on("newGroup", (data) => {
       console.log(`${socket.id} has new newGroup: `, data);
       setAllChatRooms(data);
@@ -30,11 +32,12 @@ function ChatScreen({ navigation }) {
 
   function handleLogout() {
     setCurrentUser(null);
+    setCurrentUserName('');
     setShowLoginView(false);
   }
 
   useEffect(() => {
-    console.log('currentUser chat screen', currentUser);
+    // console.log('currentUser chat screen', currentUser);
     if (!currentUser || !Object.keys(currentUser).length) {
       navigation.navigate("HomeScreen");
     }
@@ -44,7 +47,7 @@ function ChatScreen({ navigation }) {
     <View style={styles.mainWrapper}>
       <View style={styles.topContainer}>
         <View style={styles.header}>
-          <Text style={styles.heading}>Xin chào <Text style={styles.headingUserName}>{currentUserName}</Text></Text>
+          <Text style={styles.headingUserName}>{currentUserName}</Text>
           <Pressable onPress={handleLogout}>
             <AntDesign name="logout" size={30} color="black" />
           </Pressable>
@@ -55,7 +58,7 @@ function ChatScreen({ navigation }) {
           allChatRooms && allChatRooms.length > 0 ? (
             <FlatList
               data={allChatRooms}
-              renderItem={({ item }) => <ChatComponent item={item} />}
+              renderItem={({ item }) => <ChatComponent item={item} data="groups" />}
               keyExtractor={(item) => item.id}
             />
           ) : null
@@ -75,11 +78,11 @@ function ChatScreen({ navigation }) {
   );
 }
 
-export default ChatScreen;
+export default GroupsScreen;
 
 const styles = StyleSheet.create({
   mainWrapper: {
-    backgroundColor: '#ffb8f6',
+    backgroundColor: '#cebacb',
     flex: 1,
   },
   topContainer: {
@@ -89,7 +92,7 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'center',
     marginBottom: 15,
-    flex: 0.3
+    flex: 0.2,
   },
   listContainer: {
     flex: 3.4,
@@ -102,18 +105,12 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
   },
   headingUserName: {
     fontSize: 30,
     fontWeight: 'bold',
-    textDecorationLine: 'underline',
     color: '#bb007d',
-  },
-  heading: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
   },
   button: {
     backgroundColor: '#0059ff',

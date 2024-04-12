@@ -13,11 +13,12 @@ import { GlobalContext } from '../context';
 import { socket } from '../utils/index';
 
 function MessageScreen({ navigation, route }) {
-  const { currentGroupId, currentGroupName } = route.params;
+  const { data, itemData } = route.params;
   const {
     allChatMessages,
     setAllChatMessages,
     currentUser,
+    setCurrentUser,
     currentUserName,
     currentChatMesage,
     setCurrentChatMessage,
@@ -30,14 +31,29 @@ function MessageScreen({ navigation, route }) {
     };
 
     if (currentUser) {
-      const data = {
+      const dataChat = {
         currentChatMesage,
-        groupId: currentGroupId,
         currentUserName,
         timeData,
       };
-      console.log('data', data)
-      socket.emit('newChatMessage', data);
+      console.log('dataChat', dataChat)
+      if (data === 'groups') {
+        dataChat.groupId = groupId;
+        socket.emit('newChatMessage', dataChat);
+      } else {
+        socket.emit("privateMessage", {
+          content: dataChat,
+          to: itemData.userID,
+        });
+        const newMessage = {
+          id: Math.random().toString(20).substring(2, 10),
+          text: currentChatMesage,
+          currentUserName: currentUserName,
+          time: `${timeData.hour}:${timeData.minutes}`,
+        };
+        currentUser.messages.push(newMessage);
+        setCurrentUser(currentUser);
+      }
 
       setCurrentChatMessage('');
       Keyboard.dismiss();
@@ -45,29 +61,62 @@ function MessageScreen({ navigation, route }) {
   }
 
   useEffect(() => {
-    navigation.setOptions({ title: currentGroupName });
-    socket.emit("findGroup", currentGroupId);
-    socket.on("newMessage", (data) => {
-      console.log(`${socket.id} has new message: `, data);
-      setAllChatMessages(data);
-    });
-    socket.on("foundGroup", (newMessage) => {
-      console.log(`new Message foundGroup ${socket.id}`, newMessage);
-      setAllChatMessages(newMessage);
-    });
+    console.log('data', data);
+    console.log('itemData', itemData);
+    if (data === 'groups') {
+      navigation.setOptions({ title: itemData.currentGroupName });
+      socket.emit("findGroup", itemData.id);
+      socket.on("newMessage", (data) => {
+        console.log(`${socket.id} has new message: `, data);
+        setAllChatMessages(data);
+      });
+      socket.on("foundGroup", (newMessage) => {
+        console.log(`new Message foundGroup ${socket.id}`, newMessage);
+        setAllChatMessages(newMessage);
+      });
+    } else {
+      navigation.setOptions({ title: itemData.userName });
+
+      socket.on("privateMessage", ({ newMessage, from }) => {
+        const user = {
+          ...currentUser,
+        };
+        if (user.messages && user.messages.length) {
+          const findUser = user.messages.find(x => x.id === newMessage.id);
+          if (!findUser) {
+            user.messages.push(newMessage);
+          }
+        } else {
+          user.messages.push(newMessage);
+        }
+        console.log('user message', user);
+        setCurrentUser(user);
+      });
+
+    }
   }, []);
 
   return (
     <View style={styles.mainWrapper}>
       <View style={[styles.mainWrapper, { paddingVertical: 15, paddingHorizontal: 10 }]}>
         {
-          allChatMessages && allChatMessages[0] ?
+          data === 'groups' ? (
+            allChatMessages && allChatMessages[0] ?
             <FlatList
               data={allChatMessages}
               renderItem={({ item }) => <MessageComponent item={item} currentUserName={currentUserName} />}
               keyExtractor={(item) => item.id}
             />
             : ''
+          ) : (
+            currentUser && currentUser.messages ?
+            <FlatList
+              data={currentUser.messages}
+              renderItem={({ item }) => <MessageComponent item={item} currentUserName={currentUserName} />}
+              keyExtractor={(item) => item.id}
+            />
+            : ''
+          )
         }
       </View>
       <View style={styles.messageInputContainer}>

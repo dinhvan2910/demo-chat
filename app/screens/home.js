@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useLayoutEffect } from 'react';
 import {
   Alert,
   ImageBackground,
@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import { GlobalContext } from '../context';
-import { socket } from '../utils/index'
+import { socket } from '../utils/index';
 
 function HomeScreen({ navigation }) {
   const {
@@ -20,7 +20,6 @@ function HomeScreen({ navigation }) {
     setCurrentUserName,
     currentUser,
     setCurrentUser,
-    allUsers,
     setAllUsers,
   } = useContext(GlobalContext);
 
@@ -40,23 +39,36 @@ function HomeScreen({ navigation }) {
 
     Keyboard.dismiss();
   }
+  
+  // useLayoutEffect(() => {
+  //   function fetchUsers() {
+  //     fetch("http://192.168.88.182:4000/getUsers")
+  //       .then((res) => res.json())
+  //       .then((users) => {
+  //         console.log("users list api:", users);
+  //       })
+  //       .catch((err) => console.error(err));
+  //   }
+  //   fetchUsers();
+  //   socket.on("userConnected", () => {
+  //     console.log("Connected to the Socket.IO server");
+  //     console.log(socket.id);
+  //   });
+  // }, []);
 
   useEffect(() => {
     socket.on("connect", () => {
       console.log("Connected to the Socket.IO server");
+      console.log(socket.id);
     });
     socket.on("connect_error", (err) => {
       if (err.message === "invalid username") {
         setCurrentUser(null);
       }
     });
-    
-    socket.on("user connected", (user) => {
-      // initReactiveProperties(user);
-      console.log("user connected", user);
-    });
 
     socket.on("users", (users) => {
+      console.log("users list home:", users);
       users.forEach((user) => {
         user.self = user.userID === socket.id;
         initReactiveProperties(user);
@@ -77,7 +89,7 @@ function HomeScreen({ navigation }) {
   useEffect(() => {
     console.log('currentUser home screen', currentUser);
     if (currentUser && Object.keys(currentUser).length) {
-      navigation.navigate("ChatScreen");
+      navigation.navigate("Tabs");
     }
   }, [currentUser]);
 
