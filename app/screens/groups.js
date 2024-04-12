@@ -30,12 +30,6 @@ function GroupsScreen({ navigation }) {
     });
   }, [socket]);
 
-  function handleLogout() {
-    setCurrentUser(null);
-    setCurrentUserName('');
-    setShowLoginView(false);
-  }
-
   useEffect(() => {
     // console.log('currentUser chat screen', currentUser);
     if (!currentUser || !Object.keys(currentUser).length) {
@@ -48,8 +42,8 @@ function GroupsScreen({ navigation }) {
       <View style={styles.topContainer}>
         <View style={styles.header}>
           <Text style={styles.headingUserName}>{currentUserName}</Text>
-          <Pressable onPress={handleLogout}>
-            <AntDesign name="logout" size={30} color="black" />
+          <Pressable onPress={() => setModalVisible(true)}>
+            <AntDesign name="addusergroup" size={30} color="blue" />
           </Pressable>
         </View>
       </View>
@@ -64,13 +58,13 @@ function GroupsScreen({ navigation }) {
           ) : null
         }
       </View>
-      <View style={styles.bottomContainer}>
+      {/* <View style={styles.bottomContainer}>
         <Pressable onPress={() => setModalVisible(true)} style={styles.button}>
           <View>
             <Text style={styles.buttonText}>Tạo nhóm mới</Text>
           </View>
         </Pressable>
-      </View>
+      </View> */}
       {
         modalVisible && <NewGroupModal />
       }

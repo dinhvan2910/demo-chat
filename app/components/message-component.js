@@ -1,13 +1,12 @@
 import { StyleSheet, Text, View } from "react-native";
 
 export default function MessageComponent({ currentUserName, item }) {
-  console.log('currentUser mess', currentUserName);
-  console.log('item mess', item);
   const currentUserStatus = item.currentUserName !== currentUserName;
 
   return (
     <View style={currentUserStatus ? {} : { alignItems: "flex-end" }}>
       <View style={styles.messageItemWrapper}>
+        <Text style={styles.messageUserName}>{item.currentUserName}</Text>
         <View style={styles.messageItemInnerWrapper}>
           <View
             style={
@@ -47,7 +46,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 2,
   },
-  messageTime : {
-    marginLeft : 10
+  messageTime: {
+    marginLeft: 10,
+    fontSize: 14,
+    textAlign: 'right'
   }
 });

@@ -38,21 +38,21 @@ function MessageScreen({ navigation, route }) {
       };
       console.log('dataChat', dataChat)
       if (data === 'groups') {
-        dataChat.groupId = groupId;
+        dataChat.groupId = itemData.id;
         socket.emit('newChatMessage', dataChat);
       } else {
         socket.emit("privateMessage", {
           content: dataChat,
           to: itemData.userID,
         });
-        const newMessage = {
-          id: Math.random().toString(20).substring(2, 10),
-          text: currentChatMesage,
-          currentUserName: currentUserName,
-          time: `${timeData.hour}:${timeData.minutes}`,
-        };
-        currentUser.messages.push(newMessage);
-        setCurrentUser(currentUser);
+        // const newMessage = {
+        //   id: Math.random().toString(20).substring(2, 10),
+        //   text: currentChatMesage,
+        //   currentUserName: currentUserName,
+        //   time: `${timeData.hour}:${timeData.minutes}`,
+        // };
+        // currentUser.messages.push(newMessage);
+        // setCurrentUser(currentUser);
       }
 
       setCurrentChatMessage('');
@@ -77,22 +77,27 @@ function MessageScreen({ navigation, route }) {
     } else {
       navigation.setOptions({ title: itemData.userName });
 
-      socket.on("privateMessage", ({ newMessage, from }) => {
-        const user = {
-          ...currentUser,
-        };
-        if (user.messages && user.messages.length) {
-          const findUser = user.messages.find(x => x.id === newMessage.id);
-          if (!findUser) {
-            user.messages.push(newMessage);
-          }
-        } else {
-          user.messages.push(newMessage);
-        }
-        console.log('user message', user);
-        setCurrentUser(user);
+      socket.on("newPrivateMessage", ({ newMessage, from }) => {
+        console.log('newPrivateMessage newMessage ' + socket.id, newMessage);
+        setAllChatMessages(newMessage);
+        // const user = {
+        //   ...currentUser,
+        // };
+        // if (user.messages && user.messages.length) {
+        //   const findUser = user.messages.find(x => x.id === newMessage.id);
+        //   if (!findUser) {
+        //     user.messages.push(newMessage);
+        //   }
+        // } else {
+        //   user.messages.push(newMessage);
+        // }
+        // console.log('user message', user);
+        // setCurrentUser(user);
       });
-
+      socket.on("foundUserMessage", (message) => {
+        console.log(`new Message foundUserMessage ${socket.id}`, message);
+        setAllChatMessages(message);
+      });
     }
   }, []);
 
@@ -100,23 +105,23 @@ function MessageScreen({ navigation, route }) {
     <View style={styles.mainWrapper}>
       <View style={[styles.mainWrapper, { paddingVertical: 15, paddingHorizontal: 10 }]}>
         {
-          data === 'groups' ? (
-            allChatMessages && allChatMessages[0] ?
+          // data === 'groups' ? (
+          allChatMessages && allChatMessages[0] ?
             <FlatList
               data={allChatMessages}
               renderItem={({ item }) => <MessageComponent item={item} currentUserName={currentUserName} />}
               keyExtractor={(item) => item.id}
             />
             : ''
-          ) : (
-            currentUser && currentUser.messages ?
-            <FlatList
-              data={currentUser.messages}
-              renderItem={({ item }) => <MessageComponent item={item} currentUserName={currentUserName} />}
-              keyExtractor={(item) => item.id}
-            />
-            : ''
-          )
+          // ) : (
+          //   currentUser && currentUser.messages ?
+          //   <FlatList
+          //     data={currentUser.messages}
+          //     renderItem={({ item }) => <MessageComponent item={item} currentUserName={currentUserName} />}
+          //     keyExtractor={(item) => item.id}
+          //   />
+          //   : ''
+          // )
         }
       </View>
       <View style={styles.messageInputContainer}>
@@ -141,7 +146,7 @@ export default MessageScreen;
 const styles = StyleSheet.create({
   mainWrapper: {
     flex: 1,
-    backgroundColor: "#eee",
+    backgroundColor: "#f9e3ff",
   },
   messageInputContainer: {
     width: "100%",

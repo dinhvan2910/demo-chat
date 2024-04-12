@@ -35,6 +35,7 @@ socketIO.on('connection', (socket) => {
       users.push({
         userID: id,
         userName: socket.userName,
+        messages: [],
       });
     }
   }
@@ -85,10 +86,18 @@ socketIO.on('connection', (socket) => {
       currentUserName: content.currentUserName,
       time: `${content.timeData.hour}:${content.timeData.minutes}`,
     };
-    socket.to(to).emit("privateMessage", {
-      newMessage,
+
+    const idxUserTo = users.findIndex(x => x.userID === to);
+    users[idxUserTo].messages.push(newMessage);
+    const idxUserFrom = users.findIndex(x => x.userID === socket.id);
+    users[idxUserFrom].messages.push(newMessage);
+    console.log(users);
+
+    socketIO.to(to).emit("newPrivateMessage", {
+      newMessage: users[idxUserTo].messages,
       from: socket.id,
     });
+    socket.emit("foundUserMessage", users[idxUserFrom].messages);
   });
 
   socket.on("newChatMessage", (data) => {

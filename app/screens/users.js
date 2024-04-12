@@ -16,12 +16,6 @@ function UsersScreen({ navigation }) {
     setAllUsers,
   } = useContext(GlobalContext);
 
-  function handleLogout() {
-    setCurrentUser(null);
-    setCurrentUserName('');
-    setShowLoginView(false);
-  }
-
   const initReactiveProperties = (user) => {
     user.connected = true;
     user.messages = [];
@@ -58,9 +52,9 @@ function UsersScreen({ navigation }) {
       <View style={styles.topContainer}>
         <View style={styles.header}>
         <Text style={styles.headingUserName}>{currentUserName}</Text>
-          <Pressable onPress={handleLogout}>
+          {/* <Pressable onPress={handleLogout}>
             <AntDesign name="logout" size={30} color="black" />
-          </Pressable>
+          </Pressable> */}
         </View>
       </View>
       <View style={styles.listContainer}>

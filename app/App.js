@@ -8,7 +8,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import GlobalState from "./context";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import UsersScreen from "./screens/users";
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, FontAwesome6 } from '@expo/vector-icons';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -22,7 +22,7 @@ const AppTabs = () => (
         headerShown: false,
         tabBarLabel: 'Room',
         tabBarIcon: () => (
-          <AntDesign name="addusergroup" size={24} color="black" />
+          <FontAwesome6 name="people-group" size={24} color="black" />
         ),
       }}
     />
