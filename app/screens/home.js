@@ -59,7 +59,6 @@ function HomeScreen({ navigation }) {
   useEffect(() => {
     socket.on("connect", () => {
       console.log(`${socket.id} Connected to the Socket.IO server`);
-      console.log(socket.id);
     });
 
     socket.on("connect_error", (err) => {

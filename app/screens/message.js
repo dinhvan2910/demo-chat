@@ -20,7 +20,7 @@ function MessageScreen({ navigation, route }) {
     currentUser,
     setCurrentUser,
     currentUserName,
-    currentChatMesage,
+    currentChatMessage,
     setCurrentChatMessage,
   } = useContext(GlobalContext);
 
@@ -32,7 +32,7 @@ function MessageScreen({ navigation, route }) {
 
     if (currentUser) {
       const dataChat = {
-        currentChatMesage,
+        currentChatMessage,
         currentUserName,
         timeData,
       };
@@ -96,7 +96,7 @@ function MessageScreen({ navigation, route }) {
       <View style={styles.messageInputContainer}>
         <TextInput
           style={styles.messageInput}
-          value={currentChatMesage}
+          value={currentChatMessage}
           onChangeText={(value) => setCurrentChatMessage(value)}
           placeholder='Nhập tin nhắn'
         />

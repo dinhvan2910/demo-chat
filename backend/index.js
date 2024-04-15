@@ -83,7 +83,7 @@ socketIO.on('connection', (socket) => {
     console.log('privateMessage to', to);
     const newMessage = {
       id: createUniqueId(),
-      text: content.currentChatMesage,
+      text: content.currentChatMessage,
       currentUserName: content.currentUserName,
       time: `${content.timeData.hour}:${content.timeData.minutes}`,
     };
@@ -102,14 +102,14 @@ socketIO.on('connection', (socket) => {
   });
 
   socket.on("newChatMessage", (data) => {
-    const { currentChatMesage, groupId, currentUserName, timeData } = data;
+    const { currentChatMessage, groupId, currentUserName, timeData } = data;
     const filteredGroup = chatGroups.filter(
       (item) => item.id === groupId
     );
     console.log('filteredGroup', filteredGroup);
     const newMessage = {
       id: createUniqueId(),
-      text: currentChatMesage,
+      text: currentChatMessage,
       currentUserName,
       time: `${timeData.hour}:${timeData.minutes}`,
     };
