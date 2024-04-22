@@ -8,15 +8,11 @@ import { socket } from '../utils';
 
 function GroupsScreen({ navigation }) {
   const {
-    currentUserName,
     currentUser,
     allChatRooms,
     setAllChatRooms,
     modalVisible,
     setModalVisible,
-    setCurrentUser,
-    setShowLoginView,
-    setAllUsers,
   } = useContext(GlobalContext);
 
   useEffect(() => {

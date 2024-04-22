@@ -1,18 +1,32 @@
 import React, { useContext, useLayoutEffect } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import ChatComponent from '../components/chat-component';
 import { GlobalContext } from '../context';
+import { AntDesign } from '@expo/vector-icons';
+import { socket } from '../utils';
 
 function UsersScreen({ navigation }) {
   const {
     allUsers,
+    setCurrentUserName,
+    setCurrentUser,
   } = useContext(GlobalContext);
+
+  function handleLogout() {
+    setCurrentUserName('');
+    setCurrentUser(null);
+    socket.emit('logout');
+    navigation.navigate("HomeScreen");
+  }
 
   return (
     <View style={styles.mainWrapper}>
       <View style={styles.topContainer}>
         <View style={styles.header}>
           <Text style={styles.headingUserName}>Danh sách user</Text>
+          <Pressable onPress={handleLogout}>
+            <AntDesign name="logout" size={30} color="#c9021c" />
+          </Pressable>
         </View>
       </View>
       <View style={styles.listContainer}>

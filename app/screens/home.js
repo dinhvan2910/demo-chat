@@ -22,6 +22,9 @@ function HomeScreen({ navigation }) {
     setCurrentUser,
     allUsers,
     setAllUsers,
+    setAllChatMessages,
+    currentGroupName,
+    allChatRooms,
   } = useContext(GlobalContext);
 
   const initReactiveProperties = (user) => {
@@ -32,6 +35,7 @@ function HomeScreen({ navigation }) {
   function handleStart() {
     if (currentUserName.trim() !== '') {
         socket.auth = { currentUserName };
+        console.log('socket', socket.auth);
         socket.connect();
     } else {
       Alert.alert('Nhập tên kìa bạn ơi!!!');
@@ -61,11 +65,11 @@ function HomeScreen({ navigation }) {
       console.log(`${socket.id} Connected to the Socket.IO server`);
     });
 
-    socket.on("connect_error", (err) => {
-      if (err.message === "invalid username") {
-        setCurrentUser(null);
-      }
-    });
+    // socket.on("connect_error", (err) => {
+    //   if (err.message === "invalid username") {
+    //     setCurrentUser(null);
+    //   }
+    // });
     socket.on("users", (users) => {
       console.log("users list home:", users);
       setUsersData(users);
@@ -76,9 +80,26 @@ function HomeScreen({ navigation }) {
       console.log('User disconnected:', userID);
       setUsersData(users);
     });
+    // socket.on("foundGroup", (newMessage) => {
+    //   console.log(`new Message foundGroup ${socket.id}`, newMessage);
+    //   setAllChatMessages(newMessage);
+    // });
   }, [socket]);
 
   useEffect(() => {
+    socket.on("newMessage", ({groupData, userName}) => {
+      console.log('currentUserName:', currentUser.userName);
+      // console.log(`${socket.id} has new message messages: `, groupData);
+      console.log(`${socket.id} has new message userName: `, userName);
+      // console.log('allChatRooms data: ', allChatRooms)
+      if (currentUserName && (currentUser.userName.toString() !== userName.toString())) {
+        Alert.alert(`Có tin nhắn mới từ ${userName} ở group ${groupData.currentGroupName}`)
+      }
+      setAllChatMessages(groupData.messages);
+    });
+  }, []);
+
+  useLayoutEffect(() => {
     console.log('currentUser home screen', currentUser);
     console.log('All user home screen', allUsers);
     if (currentUser && Object.keys(currentUser).length) {

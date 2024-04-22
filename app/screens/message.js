@@ -18,7 +18,6 @@ function MessageScreen({ navigation, route }) {
     allChatMessages,
     setAllChatMessages,
     currentUser,
-    setCurrentUser,
     currentUserName,
     currentChatMessage,
     setCurrentChatMessage,
@@ -58,14 +57,17 @@ function MessageScreen({ navigation, route }) {
     if (data === 'groups') {
       navigation.setOptions({ title: itemData.currentGroupName });
       socket.emit("findGroup", itemData.id);
-      socket.on("newMessage", (data) => {
-        console.log(`${socket.id} has new message: `, data);
-        setAllChatMessages(data);
-      });
+      // socket.on("newMessage", (data) => {
+      //   console.log(`${socket.id} has new message: `, data);
+      //   setAllChatMessages(data);
+      // });
       socket.on("foundGroup", (newMessage) => {
         console.log(`new Message foundGroup ${socket.id}`, newMessage);
         setAllChatMessages(newMessage);
       });
+      return () => {
+        socket.emit('userOutGroup');
+      };
     } else {
       navigation.setOptions({ title: itemData.userName });
 

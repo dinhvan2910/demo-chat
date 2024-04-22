@@ -30,14 +30,18 @@ socketIO.on('connection', (socket) => {
   console.log(`${socket.id} user is just connected`);
 
   for (let [id, socket] of socketIO.of("/").sockets) {
-    const user = users.find(x => x.userID === id && x.userName === socket.userName);
-    if (!user) {
+    const userIdx = users.findIndex(x => x.userName === socket.userName);
+    console.log('userIdx', userIdx)
+    if (userIdx < 0) {
       users.push({
         userID: id,
         userName: socket.userName,
         messages: [],
         connected: true,
       });
+    } else {
+      users[userIdx].userID = id;
+      users[userIdx].connected = true;
     }
   }
   socketIO.emit("users", users);
@@ -59,7 +63,8 @@ socketIO.on('connection', (socket) => {
     chatGroups.unshift({
       id: chatGroups.length + 1,
       currentGroupName,
-      messages: []
+      messages: [],
+      usersInGroups: [],
     });
     console.log('vua tao group', chatGroups);
     socketIO
@@ -69,13 +74,23 @@ socketIO.on('connection', (socket) => {
   });
 
   socket.on("findGroup", (id) => {
-    const filteredGroup = chatGroups.filter((item) => item.id === id);
+    console.log('chatGroups data:', chatGroups)
+    const filteredGroup = chatGroups.find(item => item.id === id);
     console.log(`filteredGroup ${socket.id}:`, filteredGroup);
 
-    socket.join(filteredGroup[0].currentGroupName);
-    console.log(`User ${socket.id} a join room :` + filteredGroup[0].currentGroupName);
+    socket.join(filteredGroup.currentGroupName);
+    console.log(`User ${socket.id} a join room :` + filteredGroup.currentGroupName);
 
-    socket.emit("foundGroup", filteredGroup[0].messages);
+    const user = users.find(x => x.userID === socket.id);
+    if (user) {
+      const usersInGroups = filteredGroup.usersInGroups.find(x => x.userID === user.userID);
+      if (!usersInGroups) {
+        filteredGroup.usersInGroups.push(user);
+      }
+    }
+    console.log('chatGroups data:', chatGroups)
+
+    socket.emit("foundGroup", filteredGroup.messages);
   });
 
   socket.on("privateMessage", ({ content, to }) => {
@@ -103,10 +118,10 @@ socketIO.on('connection', (socket) => {
 
   socket.on("newChatMessage", (data) => {
     const { currentChatMessage, groupId, currentUserName, timeData } = data;
-    const filteredGroup = chatGroups.filter(
+    const findGroup = chatGroups.find(
       (item) => item.id === groupId
     );
-    console.log('filteredGroup', filteredGroup);
+    console.log('findGroup', findGroup);
     const newMessage = {
       id: createUniqueId(),
       text: currentChatMessage,
@@ -114,16 +129,25 @@ socketIO.on('connection', (socket) => {
       time: `${timeData.hour}:${timeData.minutes}`,
     };
 
-    filteredGroup[0].messages.push(newMessage);
+    findGroup.messages.push(newMessage);
     socketIO
-      .to(filteredGroup[0].currentGroupName)
-      .emit("newMessage", filteredGroup[0].messages);
-    socket.emit("groupList", chatGroups);
-    socket.emit("foundGroup", filteredGroup[0].messages);
+      .to(findGroup.currentGroupName)
+      .emit("newMessage", {groupData: findGroup, userName: currentUserName});
+    // socket.emit("groupList", chatGroups);
+    // socket.emit("foundGroup", findGroup.messages);
+  });
+
+  socket.on('logout', () => {
+    socket.disconnect();
+    console.log(`${socket.id} user is just logout`);
+    const index = users.findIndex(x => x.userID === socket.id);
+    if (index >= 0) {
+      users[index].connected = false;
+    }
   });
 
   socket.on("disconnect", () => {
-    // socket.disconnect();
+    socket.disconnect();
     console.log(`${socket.id} user is just disconnected`);
     const index = users.findIndex(x => x.userID === socket.id);
     if (index >= 0) {
